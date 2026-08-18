@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Minhas Receitas pra Emagrecer</title>
+<link rel="manifest" href="data:application/manifest+json,{}">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap');
+
+  :root{
+    --paper:#FBF6EC;
+    --paper-line:#E4D9C3;
+    --ink:#2E2A24;
+    --sage:#2E6B78;
+    --sage-dark:#1F4A54;
+    --terracotta:#C1633D;
+    --card:#FFFFFF;
+    --muted:#8A8272;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 38px / 100% 38px,
+      var(--paper);
+    font-family:'Nunito Sans', sans-serif;
+    color: var(--ink);
+    min-height:100vh;
+    padding-bottom: 100px;
+  }
+
+  header{
+    padding: 28px 20px 18px;
+    position:relative;
+  }
+
+  .eyebrow{
+    font-family:'Nunito Sans', sans-serif;
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color: var(--sage-dark);
+    margin-bottom:2px;
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:32px;
+    margin:0;
+    line-height:1.1;
+  }
+
+  h1 .script{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    color: var(--terracotta);
+    font-size:38px;
+  }
+
+  .stamp{
+    position:absolute;
+    top:24px;
+    right:20px;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    border:2px dashed var(--sage);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    transform: rotate(8deg);
+  }
+
+  .search-row{
+    padding: 0 20px 16px;
+    display:flex;
+    gap:8px;
+  }
+
+  .search-row input{
+    flex:1;
+    padding:12px 14px;
+    border-radius:12px;
+    border:2px solid var(--paper-line);
+    background: var(--card);
+    font-family:'Nunito Sans', sans-serif;
+    font-size:15px;
+    color: var(--ink);
+  }
+  .search-row input:focus{ outline:2px solid var(--sage); border-color:var(--sage); }
+
+  .grid{
+    padding: 4px 20px 20px;
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:16px;
+  }
+
+  .recipe-card{
+    background: var(--card);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow: 0 6px 0 var(--paper-line), 0 8px 20px rgba(46,42,36,0.08);
+    position:relative;
+  }
+
+  .recipe-photo{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    display:block;
+    background: linear-gradient(135deg, #E8E0CC, #DCD4BC);
+  }
+
+  .recipe-photo.placeholder{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:40px;
+    color: var(--muted);
+  }
+
+  .recipe-body{
+    padding:16px 18px 18px;
+  }
+
+  .recipe-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:21px;
+    margin:0 0 4px;
+    color: var(--ink);
+  }
+
+  .recipe-source{
+    font-size:12px;
+    color: var(--muted);
+    margin-bottom:10px;
+  }
+
+  .recipe-section-label{
+    font-family:'Nunito Sans', sans-serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color: var(--sage-dark);
+    margin: 12px 0 4px;
+  }
+
+  .recipe-text{
+    font-size:14.5px;
+    line-height:1.55;
+    color: var(--ink);
+    white-space:pre-wrap;
+  }
+
+  .card-actions{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+  }
+
+  .icon-btn{
+    border:none;
+    background: var(--paper);
+    color: var(--ink);
+    font-size:13px;
+    font-weight:700;
+    padding:8px 14px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+    border:1.5px solid var(--paper-line);
+  }
+  .icon-btn.danger{ color:#B33A3A; }
+
+  .empty-state{
+    text-align:center;
+    padding: 60px 30px;
+    color: var(--muted);
+  }
+  .empty-state .big{
+    font-size:48px;
+    margin-bottom:12px;
+  }
+  .empty-state h2{
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    color: var(--ink);
+    margin:0 0 6px;
+  }
+
+  .fab{
+    position:fixed;
+    right:20px;
+    bottom:24px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background: var(--sage);
+    color:white;
+    border:none;
+    font-size:30px;
+    box-shadow: 0 8px 20px rgba(79,110,66,0.4);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
+    transition: transform 0.15s ease;
+  }
+  .fab:active{ transform: scale(0.92); }
+
+  /* Modal */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background: rgba(46,42,36,0.55);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+  }
+  .overlay.open{ display:flex; }
+
+  .sheet{
+    background: var(--paper);
+    width:100%;
+    max-width:520px;
+    max-height:92vh;
+    overflow-y:auto;
+    border-radius:24px 24px 0 0;
+    padding: 20px 20px 28px;
+    animation: rise 0.25s ease;
+  }
+  @keyframes rise{
+    from{ transform: translateY(30px); opacity:0; }
+    to{ transform: translateY(0); opacity:1; }
+  }
+
+  .sheet h2{
+    font-family:'Fraunces', serif;
+    font-size:24px;
+    margin:0 0 16px;
+  }
+
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color: var(--sage-dark);
+    margin-bottom:6px;
+  }
+  .field input[type="text"], .field textarea{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:2px solid var(--paper-line);
+    background: var(--card);
+    font-family:'Nunito Sans', sans-serif;
+    font-size:15px;
+    color: var(--ink);
+    resize:vertical;
+  }
+  .field textarea{ min-height:90px; }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--sage); }
+
+  .photo-input-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  .photo-preview{
+    width:90px;
+    height:90px;
+    border-radius:14px;
+    object-fit:cover;
+    background: var(--paper-line);
+    flex-shrink:0;
+  }
+
+  .upload-btn{
+    background: var(--card);
+    border:2px dashed var(--sage);
+    color: var(--sage-dark);
+    font-weight:700;
+    font-size:13.5px;
+    padding:12px 16px;
+    border-radius:12px;
+    cursor:pointer;
+    flex:1;
+    text-align:center;
+  }
+  .upload-btn input{ display:none; }
+
+  .sheet-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+
+  .btn{
+    flex:1;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    font-family:'Nunito Sans', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+  .btn-primary{ background: var(--sage); color:white; }
+  .btn-secondary{ background: var(--card); color: var(--ink); border:2px solid var(--paper-line); }
+
+  .toast{
+    position:fixed;
+    bottom:100px;
+    left:50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    padding:12px 20px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+    opacity:0;
+    pointer-events:none;
+    transition: all 0.25s ease;
+    z-index:60;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    .sheet, .toast, .fab{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stamp">🥗</div>
+  <div class="eyebrow">Meu caderno de receitas</div>
+  <h1>Minhas Receitas<br><span class="script">pra emagrecer</span></h1>
+</header>
+
+<div class="search-row">
+  <input type="text" id="searchInput" placeholder="Buscar receita...">
+</div>
+
+<div class="grid" id="grid"></div>
+
+<button class="fab" id="addBtn" aria-label="Adicionar receita">+</button>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <h2 id="sheetTitle">Nova receita</h2>
+
+    <div class="field">
+      <label>Foto</label>
+      <div class="photo-input-row">
+        <img id="photoPreview" class="photo-preview" style="display:none;">
+        <label class="upload-btn" for="photoInput">📷 Escolher foto
+          <input type="file" id="photoInput" accept="image/*">
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Nome da receita</label>
+      <input type="text" id="nameInput" placeholder="Ex: Lipo Caseira">
+    </div>
+
+    <div class="field">
+      <label>Fonte (opcional)</label>
+      <input type="text" id="sourceInput" placeholder="Ex: @reeducacaoalimentar3.0">
+    </div>
+
+    <div class="field">
+      <label>Ingredientes</label>
+      <textarea id="ingredientsInput" placeholder="2 colheres de aveia&#10;1 colher de chia&#10;400ml de água&#10;Canela em pó a gosto"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Modo de preparo</label>
+      <textarea id="stepsInput" placeholder="Misture a aveia e a chia na água e deixe descansar 1 hora. Bata no liquidificador, adicione canela e beba em jejum."></textarea>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+      <button class="btn btn-primary" id="saveBtn">Salvar receita</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_KEY = 'minhasReceitasEmagrecer';
+  let recipes = [];
+  let editingId = null;
+  let pendingPhoto = null;
+
+  function loadRecipes(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      recipes = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      recipes = [];
+    }
+  }
+
+  function saveRecipes(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+  }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), 2000);
+  }
+
+  function render(filter=''){
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    const f = filter.trim().toLowerCase();
+    const list = recipes.filter(r => !f || r.name.toLowerCase().includes(f));
+
+    if(list.length === 0){
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="big">🍽️</div>
+          <h2>${recipes.length === 0 ? 'Seu caderno está vazio' : 'Nada encontrado'}</h2>
+          <p>${recipes.length === 0 ? 'Toque no + para guardar sua primeira receita.' : 'Tente buscar outro termo.'}</p>
+        </div>`;
+      return;
+    }
+
+    list.slice().reverse().forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'recipe-card';
+      card.innerHTML = `
+        ${r.photo
+          ? `<img class="recipe-photo" src="${r.photo}" alt="${r.name}">`
+          : `<div class="recipe-photo placeholder">🥣</div>`
+        }
+        <div class="recipe-body">
+          <div class="recipe-title">${escapeHtml(r.name)}</div>
+          ${r.source ? `<div class="recipe-source">${escapeHtml(r.source)}</div>` : ''}
+          ${r.ingredients ? `<div class="recipe-section-label">Ingredientes</div><div class="recipe-text">${escapeHtml(r.ingredients)}</div>` : ''}
+          ${r.steps ? `<div class="recipe-section-label">Modo de preparo</div><div class="recipe-text">${escapeHtml(r.steps)}</div>` : ''}
+          <div class="card-actions">
+            <button class="icon-btn" data-edit="${r.id}">✏️ Editar</button>
+            <button class="icon-btn danger" data-del="${r.id}">🗑️ Excluir</button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    grid.querySelectorAll('[data-edit]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openEdit(btn.dataset.edit));
+    });
+    grid.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', ()=> deleteRecipe(btn.dataset.del));
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function openNew(){
+    editingId = null;
+    pendingPhoto = null;
+    document.getElementById('sheetTitle').textContent = 'Nova receita';
+    document.getElementById('nameInput').value = '';
+    document.getElementById('sourceInput').value = '';
+    document.getElementById('ingredientsInput').value = '';
+    document.getElementById('stepsInput').value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('overlay').classList.add('open');
+  }
+
+  function openEdit(id){
+    const r = recipes.find(x => x.id === id);
+    if(!r) return;
+    editingId = id;
+    pendingPhoto = r.photo || null;
+    document.getElementById('sheetTitle').textContent = 'Editar receita';
+    document.getElementById('nameInput').value = r.name || '';
+    document.getElementById('sourceInput').value = r.source || '';
+    document.getElementById('ingredientsInput').value = r.ingredients || '';
+    document.getElementById('stepsInput').value = r.steps || '';
+    const preview = document.getElementById('photoPreview');
+    if(r.photo){
+      preview.src = r.photo;
+      preview.style.display = 'block';
+    }else{
+      preview.style.display = 'none';
+    }
+    document.getElementById('overlay').classList.add('open');
+  }
+
+  function closeSheet(){
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  function deleteRecipe(id){
+    if(!confirm('Excluir essa receita?')) return;
+    recipes = recipes.filter(r => r.id !== id);
+    saveRecipes();
+    render(document.getElementById('searchInput').value);
+    showToast('Receita excluída');
+  }
+
+  function saveRecipe(){
+    const name = document.getElementById('nameInput').value.trim();
+    if(!name){
+      showToast('Dá um nome pra receita');
+      return;
+    }
+    const data = {
+      name,
+      source: document.getElementById('sourceInput').value.trim(),
+      ingredients: document.getElementById('ingredientsInput').value.trim(),
+      steps: document.getElementById('stepsInput').value.trim(),
+      photo: pendingPhoto
+    };
+
+    if(editingId){
+      const idx = recipes.findIndex(r => r.id === editingId);
+      if(idx > -1) recipes[idx] = { ...recipes[idx], ...data };
+      showToast('Receita atualizada');
+    }else{
+      data.id = 'r' + Date.now();
+      recipes.push(data);
+      showToast('Receita salva');
+    }
+    saveRecipes();
+    closeSheet();
+    render(document.getElementById('searchInput').value);
+  }
+
+  document.getElementById('photoInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      pendingPhoto = ev.target.result;
+      const preview = document.getElementById('photoPreview');
+      preview.src = pendingPhoto;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('addBtn').addEventListener('click', openNew);
+  document.getElementById('cancelBtn').addEventListener('click', closeSheet);
+  document.getElementById('saveBtn').addEventListener('click', saveRecipe);
+  document.getElementById('overlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'overlay') closeSheet();
+  });
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    render(e.target.value);
+  });
+
+  // Seed inicial: Lipo Caseira (se o caderno estiver vazio)
+  function seedIfEmpty(){
+    if(recipes.length === 0){
+      recipes.push({
+        id: 'r' + Date.now(),
+        name: 'Lipo Caseira',
+        source: '@reeducacaoalimentar3.0',
+        ingredients: '2 colheres (sopa) de aveia\n1 colher (sopa) de chia\n400ml de água\nCanela em pó a gosto',
+        steps: 'Misture 2 colheres de aveia e 1 de chia em 200 ml de água e deixe descansar 1 hora. Bata no liquidificador com mais 200 ml de água, adicione canela a gosto e beba em jejum.',
+        photo: null
+      });
+      saveRecipes();
+    }
+  }
+
+  loadRecipes();
+  seedIfEmpty();
+  render();
+</script>
+
+</body>
+</html>
