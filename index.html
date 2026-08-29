@@ -465,6 +465,7 @@
           ${r.ingredients ? `<div class="recipe-section-label">Ingredientes</div><div class="recipe-text">${escapeHtml(r.ingredients)}</div>` : ''}
           ${r.steps ? `<div class="recipe-section-label">Modo de preparo</div><div class="recipe-text">${escapeHtml(r.steps)}</div>` : ''}
           <div class="card-actions">
+            <button class="icon-btn" data-copy="${r.id}">📋 Copiar</button>
             <button class="icon-btn" data-edit="${r.id}">✏️ Editar</button>
             <button class="icon-btn danger" data-del="${r.id}">🗑️ Excluir</button>
           </div>
@@ -479,6 +480,40 @@
     grid.querySelectorAll('[data-del]').forEach(btn=>{
       btn.addEventListener('click', ()=> deleteRecipe(btn.dataset.del));
     });
+    grid.querySelectorAll('[data-copy]').forEach(btn=>{
+      btn.addEventListener('click', ()=> copyRecipe(btn.dataset.copy));
+    });
+  }
+
+  function copyRecipe(id){
+    const r = recipes.find(x => x.id === id);
+    if(!r) return;
+    let text = r.name + '\n';
+    if(r.source) text += r.source + '\n';
+    if(r.ingredients) text += '\nIngredientes:\n' + r.ingredients + '\n';
+    if(r.steps) text += '\nModo de preparo:\n' + r.steps + '\n';
+
+    const doCopy = () => showToast('Receita copiada!');
+    const doFail = () => showToast('Não consegui copiar');
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(doCopy).catch(doFail);
+    }else{
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        doCopy();
+      }catch(e){
+        doFail();
+      }
+    }
   }
 
   function escapeHtml(str){
@@ -598,8 +633,25 @@
     }
   }
 
+  // Migração: adiciona a receita da vitamina de chia/linhaça se ainda não existir
+  function addVitaminaIfMissing(){
+    const jaTem = recipes.some(r => r.name === 'Vitamina de Chia, Linhaça e Leite Desnatado');
+    if(!jaTem){
+      recipes.push({
+        id: 'r' + Date.now() + '_v',
+        name: 'Vitamina de Chia, Linhaça e Leite Desnatado',
+        source: '',
+        ingredients: '1 copo de leite desnatado (ou vegetal)\n1 colher (sopa) de chia\n1 colher (sopa) de linhaça (de preferência moída)\n1 scoop de whey protein OU 1 colher (sopa) de iogurte grego/proteico\nCanela em pó a gosto\nOpcional: 1 fruta (banana ou morango)',
+        steps: 'Bata tudo no liquidificador até misturar bem. Deixe a chia hidratar por cerca de 10 minutos antes de tomar — ela incha e aumenta a saciedade. Boa opção para substituir o jantar, já com fibra, proteína e gordura boa.',
+        photo: 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAwIDI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSJhdXRvIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjUiIHJlZlk9IjMiIG9yaWVudD0iYXV0byIgbWFya2VyVW5pdHM9InN0cm9rZVdpZHRoIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMCw2IEw5LDMgeiIgZmlsbD0iIzg4OCIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgoKICA8IS0tIFBhc3NvIDE6IEFkaWNpb25hciBJbmdyZWRpZW50ZXMgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjAsIDIwKSI+CiAgICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIwMCIgcng9IjE1IiBmaWxsPSIjZjRmNGY5IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHRleHQgeD0iMTEwIiB5PSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMyI+MS4gQWRpY2lvbmFyPC90ZXh0PgogICAgPCEtLSBMaXF1aWRpZmljYWRvciAtLT4KICAgIDxwYXRoIGQ9Ik0gODUgNjAgTCAxMzUgNjAgTCAxMjUgMTUwIEwgOTUgMTUwIFoiIGZpbGw9IiNlMGUwZTAiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cmVjdCB4PSI5MCIgeT0iMTUwIiB3aWR0aD0iNDAiIGhlaWdodD0iMjAiIGZpbGw9IiMzMzMiLz4KICAgIDwhLS0gSW5ncmVkaWVudGVzIGNhaW5kbyAtLT4KICAgIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzIiBmaWxsPSIjOEI0NTEzIi8+CiAgICA8Y2lyY2xlIGN4PSIxMTAiIGN5PSI3NSIgcj0iMiIgZmlsbD0iIzAwMCIvPgogICAgPGNpcmNsZSBjeD0iMTE1IiBjeT0iODUiIHI9IjMiIGZpbGw9IiM4QjQ1MTMiLz4KICAgIDx0ZXh0IHg9IjExMCIgeT0iMTkwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NjYiPkxlaXRlICsgUHJvdGXDrW5hICsgU2VtZW50ZXM8L3RleHQ+CiAgPC9nPgoKICA8IS0tIFNldGEgMSAtLT4KICA8cGF0aCBkPSJNIDI1NSAxMjAgTCAyNzUgMTIwIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iMyIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz4KCiAgPCEtLSBQYXNzbyAyOiBCYXRlciAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyOTAsIDIwKSI+CiAgICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIwMCIgcng9IjE1IiBmaWxsPSIjZjRmNGY5IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHRleHQgeD0iMTEwIiB5PSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMyI+Mi4gQmF0ZXI8L3RleHQ+CiAgICA8IS0tIExpcXVpZGlmaWNhZG9yIGVtIG1vdmltZW50byAtLT4KICAgIDxwYXRoIGQ9Ik0gODUgNjAgTCAxMzUgNjAgTCAxMjUgMTUwIEwgOTUgMTUwIFoiIGZpbGw9IiNkMWUwZTAiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBkPSJNIDk1IDkwIFEgMTEwIDcwIDEyNSA5MCBRIDExMCAxMTAgOTUgOTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRhOTBlMiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cmVjdCB4PSI5MCIgeT0iMTUwIiB3aWR0aD0iNDAiIGhlaWdodD0iMjAiIGZpbGw9IiMzMzMiLz4KICAgIDx0ZXh0IHg9IjExMCIgeT0iMTkwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NjYiPkJhdGVyIGF0w6kgbWlzdHVyYXIgYmVtPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBTZXRhIDIgLS0+CiAgPHBhdGggZD0iTSA1MjUgMTIwIEwgNTQ1IDEyMCIgc3Ryb2tlPSIjODg4IiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIi8+CgogIDwhLS0gUGFzc28gMzogSGlkcmF0YXIgKGFnb3JhIGVtIGF6dWwsIHNlbSB2ZXJkZSkgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTYwLCAyMCkiPgogICAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIyMDAiIHJ4PSIxNSIgZmlsbD0iI2VhZjFmOCIgc3Ryb2tlPSIjYTNjOWU2IiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDx0ZXh0IHg9IjExMCIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyYzVmOGEiPjMuIEhpZHJhdGFyICgxMCBtaW4pPC90ZXh0PgogICAgPCEtLSBDb3BvIC0tPgogICAgPHBhdGggZD0iTSA4NSA3MCBMIDEzNSA3MCBMIDEzMCAxNTAgTCA5MCAxNTAgWiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxwYXRoIGQ9Ik0gODcgOTAgTCAxMzMgOTAgTCAxMzAgMTUwIEwgOTAgMTUwIFoiIGZpbGw9IiNlOGQ4YzgiLz4KICAgIDwhLS0gUG9udG9zIGRlIGNoaWEgaW5jaGFkb3MgLS0+CiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMTAiIHI9IjQiIGZpbGw9IiMzMzMiLz4KICAgIDxjaXJjbGUgY3g9IjExNSIgY3k9IjEyNSIgcj0iNCIgZmlsbD0iIzMzMyIvPgogICAgPGNpcmNsZSBjeD0iMTA1IiBjeT0iMTQwIiByPSI0IiBmaWxsPSIjMzMzIi8+CiAgICA8Y2lyY2xlIGN4PSIxMjAiIGN5PSIxMDUiIHI9IjQiIGZpbGw9IiMzMzMiLz4KICAgIDx0ZXh0IHg9IjExMCIgeT0iMTkwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyYzVmOGEiPkNoaWEgaW5jaGEgZSBjcmlhIGNvbnNpc3TDqm5jaWE8L3RleHQ+CiAgPC9nPgo8L3N2Zz4K'
+      });
+      saveRecipes();
+    }
+  }
+
   loadRecipes();
   seedIfEmpty();
+  addVitaminaIfMissing();
   render();
 
   if ('serviceWorker' in navigator) {
