@@ -649,9 +649,26 @@
     }
   }
 
+  // Migração: adiciona a vitamina "Derrete Gordura" se ainda não existir
+  function addDerreteGorduraIfMissing(){
+    const jaTem = recipes.some(r => r.name === 'Vitamina Derrete Gordura');
+    if(!jaTem){
+      recipes.push({
+        id: 'r' + Date.now() + '_dg',
+        name: 'Vitamina Derrete Gordura',
+        source: 'Reel do Instagram',
+        ingredients: '1 maçã\n1 banana\n2 colheres (sopa) de aveia\n200ml de leite',
+        steps: 'Bata todos os ingredientes no liquidificador. Tome no lugar da janta por uma semana.\n\nBenefícios: reduz a gordura da barriga, desinflama o intestino, ajuda a eliminar prisão de ventre e toxinas.',
+        photo: null
+      });
+      saveRecipes();
+    }
+  }
+
   loadRecipes();
   seedIfEmpty();
   addVitaminaIfMissing();
+  addDerreteGorduraIfMissing();
   render();
 
   if ('serviceWorker' in navigator) {
