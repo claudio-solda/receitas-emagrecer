@@ -681,11 +681,29 @@
     }
   }
 
+
+  // Migração: adiciona os Sucos Detox Poderosos se ainda não existirem
+  function addSucosDetoxIfMissing(){
+    const jaTem = recipes.some(r => r.name === 'Sucos Detox Poderosos');
+    if(!jaTem){
+      recipes.push({
+        id: 'r' + Date.now() + '_sd',
+        name: 'Sucos Detox Poderosos',
+        source: 'Reel do Instagram (Emagrecimento Saudável)',
+        ingredients: '1) Couve + limão — detox natural, rico em fibras, ajuda o intestino\n2) Pepino + limão — diurético natural, ajuda a eliminar toxinas, refrescante\n3) Abacaxi + hortelã — digestivo, ajuda a desinchar, refrescante\n4) Maçã + gengibre — auxilia a digestão, anti-inflamatório, estimula o metabolismo\n5) Salsinha + limão — ação detox, ajuda a eliminar líquidos, auxilia os rins\n6) Cenoura + limão — rico em antioxidantes, ajuda a limpar o organismo, fortalece a imunidade',
+        steps: 'Bata no liquidificador os dois ingredientes de cada suco com água e, se preferir, coe antes de beber.\n\nO vídeo não informou as quantidades: ajuste ao seu gosto.',
+        photo: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTIwIiB3aWR0aD0iMTAwJSI+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MjAiIGZpbGw9IiMxNDEyMTciLz48cmVjdCB4PSI2LjAiIHk9IjYuMCIgd2lkdGg9IjI1NC42NjY2NjY2NjY2NjY2OSIgaGVpZ2h0PSIyNDguMCIgcng9IjIyIiBmaWxsPSIjNEZCM0YwIi8+PHRleHQgeD0iMTMzLjMzMzMzMzMzMzMzMzM0IiB5PSIxNDAuMCIgZm9udC1zaXplPSI3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+lrPCfjYs8L3RleHQ+PHRleHQgeD0iMTMzLjMzMzMzMzMzMzMzMzM0IiB5PSIyMjYuMCIgZm9udC1zaXplPSIyNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGIyYTNkIj5Db3V2ZSArIGxpbcOjbzwvdGV4dD48cmVjdCB4PSIyNzIuNjY2NjY2NjY2NjY2NyIgeT0iNi4wIiB3aWR0aD0iMjU0LjY2NjY2NjY2NjY2NjY5IiBoZWlnaHQ9IjI0OC4wIiByeD0iMjIiIGZpbGw9IiNGNUI4MDAiLz48dGV4dCB4PSI0MDAuMCIgeT0iMTQwLjAiIGZvbnQtc2l6ZT0iNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfpZLwn42LPC90ZXh0Pjx0ZXh0IHg9IjQwMC4wIiB5PSIyMjYuMCIgZm9udC1zaXplPSIyNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjM2EyYTAwIj5QZXBpbm8gKyBsaW3Do288L3RleHQ+PHJlY3QgeD0iNTM5LjMzMzMzMzMzMzMzMzQiIHk9IjYuMCIgd2lkdGg9IjI1NC42NjY2NjY2NjY2NjY2OSIgaGVpZ2h0PSIyNDguMCIgcng9IjIyIiBmaWxsPSIjRkY4QTFGIi8+PHRleHQgeD0iNjY2LjY2NjY2NjY2NjY2NjciIHk9IjE0MC4wIiBmb250LXNpemU9Ijc4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn42N8J+MvzwvdGV4dD48dGV4dCB4PSI2NjYuNjY2NjY2NjY2NjY2NyIgeT0iMjI2LjAiIGZvbnQtc2l6ZT0iMjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzNhMWMwMCI+QWJhY2F4aSArIGhvcnRlbMOjPC90ZXh0PjxyZWN0IHg9IjYuMCIgeT0iMjY2LjAiIHdpZHRoPSIyNTQuNjY2NjY2NjY2NjY2NjkiIGhlaWdodD0iMjQ4LjAiIHJ4PSIyMiIgZmlsbD0iI0U4MDAyMCIvPjx0ZXh0IHg9IjEzMy4zMzMzMzMzMzMzMzMzNCIgeT0iNDAwLjAiIGZvbnQtc2l6ZT0iNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfjY7wn6uaPC90ZXh0Pjx0ZXh0IHg9IjEzMy4zMzMzMzMzMzMzMzMzNCIgeT0iNDg2LjAiIGZvbnQtc2l6ZT0iMjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiI+TWHDp8OjICsgZ2VuZ2licmU8L3RleHQ+PHJlY3QgeD0iMjcyLjY2NjY2NjY2NjY2NjciIHk9IjI2Ni4wIiB3aWR0aD0iMjU0LjY2NjY2NjY2NjY2NjY5IiBoZWlnaHQ9IjI0OC4wIiByeD0iMjIiIGZpbGw9IiM5QjVERTUiLz48dGV4dCB4PSI0MDAuMCIgeT0iNDAwLjAiIGZvbnQtc2l6ZT0iNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfjL/wn42LPC90ZXh0Pjx0ZXh0IHg9IjQwMC4wIiB5PSI0ODYuMCIgZm9udC1zaXplPSIyNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIj5TYWxzaW5oYSArIGxpbcOjbzwvdGV4dD48cmVjdCB4PSI1MzkuMzMzMzMzMzMzMzMzNCIgeT0iMjY2LjAiIHdpZHRoPSIyNTQuNjY2NjY2NjY2NjY2NjkiIGhlaWdodD0iMjQ4LjAiIHJ4PSIyMiIgZmlsbD0iI0YyNzA2RSIvPjx0ZXh0IHg9IjY2Ni42NjY2NjY2NjY2NjY3IiB5PSI0MDAuMCIgZm9udC1zaXplPSI3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+llfCfjYs8L3RleHQ+PHRleHQgeD0iNjY2LjY2NjY2NjY2NjY2NjciIHk9IjQ4Ni4wIiBmb250LXNpemU9IjI1IiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzYTBhMGEiPkNlbm91cmEgKyBsaW3Do288L3RleHQ+PC9zdmc+'
+      });
+      saveRecipes();
+    }
+  }
+
   loadRecipes();
   seedIfEmpty();
   addVitaminaIfMissing();
   addDerreteGorduraIfMissing();
   addCremeAlhoIfMissing();
+  addSucosDetoxIfMissing();
   render();
 
   if ('serviceWorker' in navigator) {
